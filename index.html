@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Northstar — Funds Admin</title>
+<style>
+:root{--bg:#f3f5f9;--panel:#fff;--ink:#172033;--muted:#687386;--line:#e5e9f0;--nav:#101827;--accent:#2457d6;--good:#16845b;--warn:#a66b08;--bad:#bd3946}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--nav);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-weight:750;letter-spacing:.2px}.brand small{display:block;color:#aeb8c9;font-size:11px;font-weight:500}
+.pill{border:1px solid #64748b;border-radius:999px;padding:5px 10px;font-size:12px;color:#dce5f3}
+.layout{max-width:1180px;margin:24px auto;padding:0 18px;display:grid;grid-template-columns:220px 1fr;gap:20px}
+nav,.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+nav{padding:12px;height:max-content}nav button{display:block;width:100%;border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:9px;color:#4a5568;font-weight:600;cursor:pointer}nav button.active,nav button:hover{background:#edf2ff;color:var(--accent)}
+main h1{font-size:25px;margin:0 0 4px} .sub{color:var(--muted);margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.card{padding:17px}.label{font-size:12px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.06em}.value{font-size:26px;font-weight:750;margin-top:7px}.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.section{margin-bottom:16px}.section h2{font-size:17px;margin:0 0 12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+button.primary,button.secondary,button.danger{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+.primary{background:var(--accent);color:#fff}.secondary{background:#edf1f7;color:#263247}.danger{background:#fff0f1;color:var(--bad)}
+button:disabled{opacity:.45;cursor:not-allowed}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.status{font-size:11px;font-weight:750;border-radius:999px;padding:4px 8px;background:#edf1f7;display:inline-block}.status.good{background:#e8f6ef;color:var(--good)}.status.warn{background:#fff4df;color:var(--warn)}
+input{width:100%;padding:10px;border:1px solid #d9dfeb;border-radius:8px;font:inherit;min-width:0}label{font-size:12px;color:var(--muted);font-weight:650;display:block;margin:8px 0 5px}
+.fields{display:grid;grid-template-columns:1.2fr 1.8fr .8fr .7fr auto;gap:9px;align-items:end}
+.notice{padding:12px 14px;border-radius:10px;background:#fff7e8;color:#78500a;font-size:13px;margin-bottom:16px;border:1px solid #f2dfb8}
+.empty{padding:24px;text-align:center;color:var(--muted)}.hidden{display:none!important}
+footer{max-width:1180px;margin:0 auto;padding:0 18px 24px;color:var(--muted);font-size:12px}
+.modal{position:fixed;inset:0;background:#10182799;display:grid;place-items:center;padding:18px}.dialog{background:white;border-radius:15px;padding:22px;max-width:520px;width:100%;box-shadow:0 18px 70px #0003}.dialog h2{margin-top:0}
+@media(max-width:760px){.layout{display:block;margin:14px auto}nav{display:flex;overflow:auto;margin-bottom:15px;gap:4px}nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr 1fr}.fields button{grid-column:1/-1}table{min-width:620px}.table-wrap{overflow:auto}.value{font-size:22px}}
+@media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.card{padding:13px}.value{font-size:19px}header{padding:13px 16px}}
+</style>
+</head>
+<body>
+<header><div class="brand">NORTHSTAR <small>Funds & disbursement console</small></div><span class="pill">SANDBOX · SIMULATED FUNDS</span></header>
+<div class="layout">
+<nav aria-label="Main navigation">
+<button class="active" data-view="overview">Overview</button><button data-view="conversion">Conversion</button><button data-view="distribution">Distribution</button><button data-view="receipts">Receipts</button><button data-view="security">Security & audit</button>
+</nav>
+<main>
+<section id="overview" class="view">
+<h1>Admin overview</h1><div class="sub">A controlled workflow: no conversion or payout occurs without separate owner approvals.</div>
+<div class="notice"><strong>Safe test mode:</strong> this prototype uses simulated balances and fake transactions. It is not connected to Visa, an M1 provider, a wallet, or the TRON network.</div>
+<div class="grid">
+<div class="card"><div class="label">Simulated M1 balance</div><div class="value" id="m1">$2,500.00</div><div class="hint">Sandbox ledger only</div></div>
+<div class="card"><div class="label">USDT available</div><div class="value" id="usdt">0.00</div><div class="hint">No real crypto held</div></div>
+<div class="card"><div class="label">Payouts sent</div><div class="value" id="sent">0.00</div><div class="hint">Simulated confirmed receipts</div></div>
+</div>
+<div class="card section"><div class="row"><h2>Workflow status</h2><span class="status warn" id="state">Awaiting conversion review</span></div>
+<table><tbody><tr><td>1. M1 funds</td><td><span class="status good">Sandbox balance loaded</span></td></tr><tr><td>2. Conversion</td><td id="conversionState">Awaiting owner approval</td></tr><tr><td>3. Distribution</td><td id="distributionState">Locked until conversion</td></tr><tr><td>4. Receipts</td><td>Generated only after simulated confirmation</td></tr></tbody></table>
+<div style="margin-top:14px"><button class="primary" onclick="show('conversion')">Review conversion</button> <button class="secondary" onclick="simulateDeposit()">Simulate incoming M1 funds</button></div></div>
+</section>
+<section id="conversion" class="view hidden">
+<h1>Conversion review</h1><div class="sub">Review the quote first. Approval is a separate action from every later payout.</div>
+<div class="card section"><div class="grid"><div><div class="label">M1 amount</div><div class="value" id="quoteM1">$2,500.00</div></div><div><div class="label">Illustrative rate</div><div class="value">1.00</div><div class="hint">Placeholder only; not a live quote</div></div><div><div class="label">Estimated USDT</div><div class="value" id="quoteUsdt">2,500.00</div></div></div>
+<label>Test conversion amount (USD)</label><input id="convertAmount" type="number" min="1" step=".01" value="2500">
+<p class="hint">Production must use the provider's verified settlement amount, a firm quote, disclosed fees, and idempotent transaction references.</p>
+<div class="row"><span class="status warn">Owner approval required</span><button class="primary" onclick="approveConversion()">Approve simulated conversion</button></div></div>
+</section>
+<section id="distribution" class="view hidden">
+<h1>Distribution plan</h1><div class="sub">Add recipients and allocate 100% of the available simulated USDT.</div>
+<div class="notice">For safety, this demo accepts sample addresses only and never broadcasts a blockchain transaction.</div>
+<div class="card section"><div class="row"><h2>Available for allocation</h2><strong id="available">0.00 USDT</strong></div>
+<div class="fields">
+<div><label>Recipient name</label><input id="name" placeholder="Recipient A"></div>
+<div><label>TRON address (sample)</label><input id="wallet" placeholder="T... sample address"></div>
+<div><label>Amount USDT</label><input id="amount" type="number" min=".01" step=".01" placeholder="100"></div>
+<div><label>Share %</label><input id="share" type="number" min="0" max="100" step=".01" placeholder="10"></div>
+<button class="secondary" onclick="addRecipient()">Add</button>
+</div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Wallet</th><th>Amount</th><th>Share</th><th></th></tr></thead><tbody id="recipients"><tr><td colspan="5" class="empty">No recipients added.</td></tr></tbody></table></div>
+<div class="row" style="margin-top:14px"><span id="allocationSummary" class="hint">Allocated: 0.00 USDT · 0%</span><button class="primary" id="reviewBtn" onclick="reviewPayout()" disabled>Review payout batch</button></div></div>
+</section>
+<section id="receipts" class="view hidden">
+<h1>Payment receipts</h1><div class="sub">A receipt is created only when the demo marks a payout as confirmed.</div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>Recipient</th><th>Amount</th><th>Status</th><th>Reference</th><th>Receipt</th></tr></thead><tbody id="receiptRows"><tr><td colspan="5" class="empty">No receipts yet.</td></tr></tbody></table></div></div>
+</section>
+<section id="security" class="view hidden">
+<h1>Security & audit</h1><div class="sub">Controls that must be enforced server-side before production.</div>
+<div class="card"><table><tbody>
+<tr><td>Separate conversion and payout approvals</td><td><span class="status good">Designed into workflow</span></td></tr>
+<tr><td>Any edit invalidates prior payout approval</td><td><span class="status good">Enabled in demo</span></td></tr>
+<tr><td>Owner MFA / passkey</td><td><span class="status warn">Backend setup required</span></td></tr>
+<tr><td>Immutable audit log and idempotency</td><td><span class="status warn">Backend setup required</span></td></tr>
+<tr><td>TRON confirmation verification</td><td><span class="status warn">Not connected</span></td></tr>
+<tr><td>Provider API credentials and webhook verification</td><td><span class="status warn">Not connected</span></td></tr>
+</tbody></table><p class="hint">Never put provider secrets, private keys, seed phrases, or signing credentials in browser code. Use a server-side secrets manager and a separately reviewed signing service.</p></div>
+</section>
+</main>
+</div>
+<footer>Prototype only · All values and confirmations are simulated · Do not use real recipient funds or credentials.</footer>
+<div id="modal" class="modal hidden"><div class="dialog"><h2 id="modalTitle">Review payout</h2><div id="modalBody"></div><div class="row" style="margin-top:18px"><button class="secondary" onclick="closeModal()">Back</button><button class="primary" id="modalConfirm">Confirm</button></div></div></div>
+<script>
+let m1=2500, usdt=0, sent=0, recipients=[], receipts=[], converted=false;
+const money=n=>Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function refresh(){document.getElementById('m1').textContent='$'+money(m1);document.getElementById('usdt').textContent=money(usdt);document.getElementById('sent').textContent=money(sent);document.getElementById('quoteM1').textContent='$'+money(m1);document.getElementById('quoteUsdt').textContent=money(Number(document.getElementById('convertAmount').value||0));document.getElementById('available').textContent=money(usdt)+' USDT';}
+document.getElementById('convertAmount').addEventListener('input',refresh);
+function simulateDeposit(){m1+=250;refresh();alert('Sandbox only: $250 simulated M1 funds added.');}
+function approveConversion(){let n=Number(document.getElementById('convertAmount').value);if(converted){alert('A conversion has already been simulated.');return}if(!(n>0&&n<=m1)){alert('Enter an amount within the simulated M1 balance.');return}
+openModal('Approve simulated conversion',`You are approving a <b>simulated</b> conversion of $${money(n)} at a placeholder 1:1 rate. No real provider or crypto transaction will occur.`,()=>{m1-=n;usdt+=n;converted=true;document.getElementById('conversionState').innerHTML='<span class="status good">Simulated conversion approved</span>';document.getElementById('distributionState').innerHTML='<span class="status warn">Awaiting separate payout approval</span>';document.getElementById('state').textContent='Ready for distribution planning';refresh();show('distribution')})}
+function addRecipient(){if(!converted){alert('Approve a simulated conversion first.');return}let name=document.getElementById('name').value.trim(),wallet=document.getElementById('wallet').value.trim(),amount=Number(document.getElementById('amount').value),share=Number(document.getElementById('share').value);if(!name||!wallet||!(amount>0)||!(share>0)){alert('Complete all recipient fields with positive amount and share.');return}if(!/^T[1-9A-HJ-NP-Za-km-z]{10,}$/.test(wallet)){alert('Enter a TRON-format sample address beginning with T. This demo does not verify ownership or network validity.');return}recipients.push({name,wallet,amount,share});['name','wallet','amount','share'].forEach(x=>document.getElementById(x).value='');renderRecipients();}
+function renderRecipients(){let body=document.getElementById('recipients');body.innerHTML=recipients.length?recipients.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${esc(r.wallet)}</td><td>${money(r.amount)}</td><td>${money(r.share)}%</td><td><button class="danger" onclick="removeRecipient(${i})">Remove</button></td></tr>`).join(''):'<tr><td colspan="5" class="empty">No recipients added.</td></tr>';let total=recipients.reduce((s,r)=>s+r.amount,0),pct=recipients.reduce((s,r)=>s+r.share,0);document.getElementById('allocationSummary').textContent=`Allocated: ${money(total)} USDT · ${money(pct)}%`;document.getElementById('reviewBtn').disabled=!(recipients.length&&Math.abs(total-usdt)<.005&&Math.abs(pct-100)<.005); }
+function removeRecipient(i){recipients.splice(i,1);renderRecipients();}
+function reviewPayout(){let rows=recipients.map(r=>`<li>${esc(r.name)} — ${money(r.amount)} USDT (${money(r.share)}%)<br><small>${esc(r.wallet)}</small></li>`).join('');openModal('Final payout approval',`<p>Review every recipient and amount carefully:</p><ul>${rows}</ul><p><b>Total:</b> ${money(usdt)} USDT</p><p>This is a simulated confirmation only. Editing any recipient requires a fresh review.</p>`,()=>{let batch=recipients.map((r,i)=>({...r,ref:'DEMO-'+Date.now()+'-'+(i+1)}));batch.forEach(r=>{receipts.push({...r,status:'SIMULATED CONFIRMED',date:new Date().toLocaleString()});sent+=r.amount});usdt=0;recipients=[];converted=false;document.getElementById('distributionState').innerHTML='<span class="status good">Demo batch completed</span>';document.getElementById('state').textContent='Demo batch completed';renderRecipients();renderReceipts();refresh();show('receipts')})}
+function renderReceipts(){let b=document.getElementById('receiptRows');b.innerHTML=receipts.length?receipts.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${money(r.amount)} USDT</td><td><span class="status good">${r.status}</span></td><td>${esc(r.ref)}</td><td><button class="secondary" onclick="receipt(${i})">Print / PDF</button></td></tr>`).join(''):'<tr><td colspan="5" class="empty">No receipts yet.</td></tr>'}
+function receipt(i){let r=receipts[i],w=window.open('','_blank');w.document.write(`<h1>Payment receipt — DEMO</h1><p><b>Recipient:</b> ${esc(r.name)}</p><p><b>Wallet:</b> ${esc(r.wallet)}</p><p><b>Amount:</b> ${money(r.amount)} USDT</p><p><b>Status:</b> SIMULATED CONFIRMED — not a blockchain confirmation</p><p><b>Reference:</b> ${esc(r.ref)}</p><p><b>Date:</b> ${esc(r.date)}</p><p>This is a test receipt only. No transfer occurred.</p>`);w.document.close();w.print()}
+function openModal(title,body,fn){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=body;document.getElementById('modal').classList.remove('hidden');document.getElementById('modalConfirm').onclick=()=>{closeModal();fn()}}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+refresh();
+</script>
+</body></html>
